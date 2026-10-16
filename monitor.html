@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>Pachys Tempus — Monitor</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="mon">
+<div class="mon-app">
+  <header class="mtop">
+    <div class="brand" id="brand" title="long-press: instructor panel">PACHYS<span>TEMPUS</span></div>
+    <div class="alarmbar" id="alarmbar"></div>
+    <div class="mstat">
+      <span id="linkTxt" class="linktxt"></span><span id="linkDot" class="dot disconnected"></span>
+      <span id="clock">--:--:--</span>
+      <span class="batt" aria-hidden="true"><i></i></span>
+    </div>
+  </header>
+
+  <main class="mmain">
+    <section class="waves">
+      <div class="strip ecg"><span class="wl">II&nbsp;&nbsp;x1.0&nbsp;&nbsp;25 mm/s</span><canvas id="cEcg"></canvas></div>
+      <div class="strip pleth"><span class="wl">Pleth</span><canvas id="cPleth"></canvas></div>
+      <div class="strip co2"><span class="wl">CO₂ mmHg</span><canvas id="cCo2"></canvas></div>
+    </section>
+    <section class="nums">
+      <div class="nb hr" id="nbHr">
+        <span class="nl"><b id="hrSrc">HR</b> <small>bpm</small></span>
+        <span class="heart" id="heart">♥</span>
+        <span class="nv" id="vHr">---</span>
+        <span class="lim">120<br>50</span>
+      </div>
+      <div class="nb spo2" id="nbSpo2">
+        <span class="nl">SpO₂ <small>%</small></span>
+        <span class="nv" id="vSpo2">---</span>
+        <span class="lim">100<br>90</span>
+      </div>
+      <div class="nb nibp" id="nbNibp">
+        <span class="nl">NIBP <small>mmHg</small> <em id="nibpTime"></em></span>
+        <span class="nv" id="vNibp">---/---</span>
+        <span class="sub"><span id="vMap">(---)</span> <span id="nibpAuto"></span></span>
+      </div>
+      <div class="nb co2" id="nbCo2">
+        <span class="nl">EtCO₂ <small>mmHg</small></span>
+        <span class="nv" id="vCo2">---</span>
+        <span class="rr"><small>RR</small><b id="vRr">---</b></span>
+      </div>
+      <div class="nb temp" id="nbTemp">
+        <span class="nl">T1 <small>°C</small></span>
+        <span class="nv" id="vTemp">---</span>
+      </div>
+    </section>
+  </main>
+
+  <nav class="mkeys">
+    <button id="kNibp">NIBP<small>Start / Stop</small></button>
+    <button id="kAuto">NIBP Auto<small id="autoLbl">Off</small></button>
+    <button id="kSil">Alarm<small id="silLbl">Silence</small></button>
+    <button id="kTone">Pulse tone<small id="toneLbl">On</small></button>
+    <span class="kspacer"></span>
+    <button id="kEnergy" class="defk">Energy<small id="energyLbl">200 J</small></button>
+    <button id="kCharge" class="defk charge">CHARGE</button>
+    <button id="kShock" class="defk shock" disabled>SHOCK</button>
+    <button id="kMenu">Menu</button>
+  </nav>
+</div>
+
+<div id="toast" class="toast"></div>
+
+<div id="startOverlay" class="overlay">
+  <div>
+    <div class="ov-logo">PACHYS<span>TEMPUS</span></div>
+    <p>Tap to start the monitor</p>
+    <p class="he" dir="rtl">לחץ כדי להפעיל (נדרש להפעלת הצלילים)</p>
+  </div>
+</div>
+
+<div id="menu" class="modal hidden">
+  <div class="panel">
+    <h2>Menu</h2>
+    <button id="mPair" class="row">Pair instructor (QR, no internet) <span dir="rtl">חיבור עמדת מדריך</span></button>
+    <button id="mDrawer" class="row">Instructor panel on this device <span dir="rtl">מצב מכשיר יחיד</span></button>
+    <button id="mAlarm" class="row">Alarm sound <b id="optAlarm">On</b></button>
+    <label class="row">Volume <input id="optVol" type="range" min="0" max="1" step="0.05"></label>
+    <button id="mFull" class="row">Full screen</button>
+    <button id="mReset" class="row">Reset to baseline</button>
+    <a class="row" href="./">Home</a>
+    <button class="close" data-close>Close</button>
+  </div>
+</div>
+
+<div id="pairModal" class="modal hidden" dir="rtl">
+  <div class="panel pair">
+    <h2>חיבור עמדת מדריך — ללא אינטרנט</h2>
+    <p class="hint">שני המכשירים צריכים להיות על אותה רשת Wi-Fi או על נקודה חמה (Hotspot) — אין צורך בחיבור לאינטרנט.</p>
+    <div class="pair-body">
+      <div class="qrbox"><canvas id="qrOffer"></canvas><div id="offerStatus" class="pstat"></div></div>
+      <div class="cambox">
+        <video id="pairVideo" playsinline muted autoplay></video>
+        <div id="scanStatus" class="pstat">2. ממתין לקוד התשובה מהאייפון</div>
+        <button id="flipCam">החלף מצלמה</button>
+      </div>
+    </div>
+    <details>
+      <summary>אין מצלמה? העתק / הדבק (או AirDrop)</summary>
+      <button id="copyOffer">העתק / שתף את קוד המוניטור</button>
+      <textarea id="pasteAnswer" rows="3" placeholder="הדבק כאן את קוד התשובה (מתחיל ב-PT1A)"></textarea>
+      <button id="useAnswer">חבר</button>
+    </details>
+    <button class="close" data-close>סגור</button>
+  </div>
+</div>
+
+<aside id="drawer" class="drawer hidden" dir="rtl">
+  <div class="drawer-head"><b>עמדת מדריך — מכשיר זה</b><button id="closeDrawer">✕</button></div>
+  <div id="drawerCtl"></div>
+</aside>
+
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/jsQR.js"></script>
+<script type="module" src="js/monitor.js"></script>
+</body>
+</html>

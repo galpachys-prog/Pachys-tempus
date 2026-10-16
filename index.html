@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pachys Tempus">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0f14">
+<title>Pachys Tempus</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="home">
+<main class="home-wrap">
+  <h1 class="hlogo">PACHYS<span>TEMPUS</span></h1>
+  <p class="sub">מוניטור סימולציה לאימוני ALS — עובד גם ללא רשת</p>
+
+  <div class="launch">
+    <a class="lbtn mon" href="monitor.html"><b>מוניטור</b><small>לטאבלט — מה שהחניכים רואים</small></a>
+    <a class="lbtn ins" href="instructor.html"><b>עמדת מדריך</b><small>לאייפון — שליטה במדדים</small></a>
+    <a class="lbtn solo" href="monitor.html?solo"><b>מכשיר יחיד</b><small>מוניטור + פאנל מדריך באותו מכשיר</small></a>
+  </div>
+
+  <div id="offline" class="offline wait">בודק זמינות לא-מקוונת…</div>
+
+  <details class="howto" open>
+    <summary>הכנה לעבודה בשטח (פעם אחת, עם אינטרנט)</summary>
+    <ol>
+      <li>פתח את הכתובת הזו ב-<b>Safari</b> בטאבלט ובאייפון, וחכה להודעה הירוקה “מוכן לעבודה ללא רשת”.</li>
+      <li>בכל מכשיר: כפתור שיתוף ← <b>הוסף למסך הבית</b>. מעכשיו פתח רק מהאייקון.</li>
+      <li>פתח פעם אחת את “מוניטור” בטאבלט ואת “עמדת מדריך” באייפון ואשר הרשאת מצלמה.</li>
+    </ol>
+  </details>
+  <details class="howto">
+    <summary>בשטח — ללא קליטה</summary>
+    <ol>
+      <li><b>חיבור בין המכשירים:</b> הפעל נקודה חמה (Personal Hotspot) באחד המכשירים וחבר אליה את השני, או השתמש בכל ראוטר Wi-Fi נייד. אין צורך באינטרנט — רק רשת מקומית משותפת.</li>
+      <li>בטאבלט: Menu ← <b>Pair instructor</b> — יוצג קוד QR.</li>
+      <li>באייפון: <b>סרוק קוד מוניטור</b> ← יוצג קוד תשובה; הצג אותו למצלמת הטאבלט. המכשירים מתחברים ישירות זה לזה.</li>
+      <li><b>אין רשת בכלל?</b> בחר “מכשיר יחיד”: לחיצה ארוכה על הלוגו בפינת המוניטור פותחת את פאנל המדריך. באייפד אפשר גם Split View — מוניטור בחלון אחד ועמדת מדריך בחלון שני, והם מתחברים אוטומטית.</li>
+    </ol>
+    <p class="note">אם החיבור נקטע (מסך כבוי, מעבר רשת) — מבצעים שוב את הסריקה. המוניטור שומר את המדדים האחרונים.</p>
+  </details>
+  <p class="ver" id="ver"></p>
+</main>
+<script type="module">
+  import { registerSW } from './js/common.js';
+  const el = document.getElementById('offline');
+  registerSW(async (ok) => {
+    if (!ok) { el.className = 'offline bad'; el.textContent = 'הדפדפן לא תומך בעבודה לא-מקוונת (נדרש Safari/Chrome עדכני, ובכתובת https).'; return; }
+    // Ask the SW whether the full app is cached.
+    const ch = new MessageChannel();
+    ch.port1.onmessage = (e) => {
+      const { ready, version } = e.data || {};
+      document.getElementById('ver').textContent = version || '';
+      el.className = 'offline ' + (ready ? 'ok' : 'wait');
+      el.textContent = ready ? '✓ מוכן לעבודה ללא רשת' : 'מוריד קבצים לשימוש לא-מקוון… רענן בעוד רגע';
+    };
+    const sw = navigator.serviceWorker.controller || (await navigator.serviceWorker.ready).active;
+    sw && sw.postMessage({ t: 'status' }, [ch.port2]);
+  });
+</script>
+</body>
+</html>

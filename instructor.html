@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0b0f14">
+<title>Pachys Tempus — עמדת מדריך</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="ipage">
+<header class="ihead">
+  <a href="./" class="ibrand">PACHYS<span>TEMPUS</span></a>
+  <span id="linkPill" class="pill disconnected">לא מחובר</span>
+</header>
+
+<section id="pairCard" class="card">
+  <div id="pairIdle">
+    <p>חיבור למוניטור ללא אינטרנט: שני המכשירים על אותה רשת Wi-Fi או נקודה חמה. בטאבלט: <b>Menu ← Pair instructor</b>.</p>
+    <button id="scanBtn" class="big">סרוק קוד מוניטור</button>
+  </div>
+  <div id="scanArea" hidden>
+    <video id="scanVideo" playsinline muted autoplay></video>
+    <div class="row2"><button id="flipBtn">החלף מצלמה</button><button id="cancelScan" class="ghost">ביטול</button></div>
+  </div>
+  <div id="answerArea" hidden>
+    <p><b>הצג את הקוד הזה מול מצלמת הטאבלט:</b></p>
+    <canvas id="qrAnswer"></canvas>
+    <p id="answerStatus" class="pstat">ממתין לחיבור…</p>
+    <div class="row2"><button id="shareAnswer">שתף / העתק קוד (AirDrop)</button><button id="restartPair" class="ghost">התחל מחדש</button></div>
+  </div>
+  <div id="pairDone" hidden>
+    <p>מחובר למוניטור ✓ <span id="viaTxt"></span></p>
+    <button id="repair" class="ghost">חיבור מחדש</button>
+  </div>
+  <details id="pasteBox">
+    <summary>אין מצלמה? הדבק קוד מוניטור</summary>
+    <textarea id="pasteOffer" rows="3" placeholder="קוד שמתחיל ב-PT1O"></textarea>
+    <button id="useOffer">צור קוד תשובה</button>
+  </details>
+  <p id="pairErr" class="err"></p>
+</section>
+
+<div id="ctl"></div>
+
+<script src="vendor/qrcode.js"></script>
+<script src="vendor/jsQR.js"></script>
+<script type="module" src="js/instructor.js"></script>
+</body>
+</html>

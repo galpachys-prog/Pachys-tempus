@@ -13,6 +13,7 @@ export function buildControls(root, { send }) {
   let pending = {};
   let ramp = 0;
   let live = false;
+  let curScen = '';
   let synced = false;
   let timer = { start: null, acc: 0 };
   const events = [];
@@ -73,7 +74,7 @@ export function buildControls(root, { send }) {
     <section class="ctl-grid scen">
       ${SCENARIOS.map((s) => `<button data-scen="${s.id}">${esc(s.name)}</button>`).join('')}
     </section>
-    <p class="hint">בחירת תרחיש טוענת ערכים כשינויים ממתינים — לחץ “החל” כדי לשלוח.</p>
+    <p class="hint">לחיצה על תרחיש משדרת אותו מיד למוניטור, עם זמן המעבר שנבחר למעלה.</p>
 
     <h3>יומן אירועים</h3>
     <ol class="ctl-log" data-log></ol>
@@ -104,6 +105,7 @@ export function buildControls(root, { send }) {
       inp.closest('.param').classList.toggle('pend', p.k in pending);
     }
     $$('[data-ramp]').forEach((b) => b.classList.toggle('on', Number(b.dataset.ramp) === ramp));
+    $$('[data-scen]').forEach((b) => b.classList.toggle('on', b.dataset.scen === curScen));
     const leads = val('leads');
     $$('[data-lead]').forEach((b) => {
       b.classList.toggle('on', !!leads[b.dataset.lead]);
@@ -188,11 +190,14 @@ export function buildControls(root, { send }) {
     else if (d.lead) { const l = val('leads'); change({ leads: { [d.lead]: !l[d.lead] } }); }
     else if (d.scen) {
       const s = SCENARIOS.find((x) => x.id === d.scen);
+      if (!s) return;
+      // A scenario goes to the monitor straight away (with the chosen ramp time).
       const was = live; live = false;
       change(cloneState(s.p));
       live = was;
-      log(`נטען תרחיש: ${s.name}`, 'scen');
-      if (live) apply();
+      curScen = s.id;
+      log(`תרחיש: ${s.name}`, 'scen');
+      if (Object.keys(pending).length) apply(); else render();
     } else if (d.act === 'apply') apply();
     else if (d.act === 'discard') { pending = {}; render(); }
     else if (d.act === 'live') { live = !live; if (live) apply(); render(); }

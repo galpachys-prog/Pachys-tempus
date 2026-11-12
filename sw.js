@@ -1,5 +1,5 @@
 // Pachys Tempus — service worker: precache everything, serve cache-first.
-const VERSION = 'pt-v1.0.0';
+const VERSION = 'pt-v1.0.1';
 const ASSETS = [
   './',
   './index.html',

@@ -17,6 +17,9 @@ Offline patient-monitor simulator for ALS / medical-simulation training. The mon
 - Defibrillator: energy select, charge, shock (artefact + event sent to instructor)
 - Instructor: staged changes with Apply or LIVE mode, ramp times (instant–5 min), sensor attach/detach, 14 preset scenarios, scenario timer, event log (shocks, charges, NIBP, alarms)
 
+## Full version
+`full/` holds the full single-file build (clinical pictures, IDF-doctrine checklists, staged scenarios, labs and images), with its own service worker scoped to `/full/`: https://galpachys-prog.github.io/Pachys-tempus/full/
+
 ## Files
 `index.html` launcher · `monitor.html` · `instructor.html` · `js/` (physio engine, audio, link, pairing, controls) · `sw.js` offline cache · `vendor/` jsQR (Apache-2.0) and qrcode-generator (MIT).
 
